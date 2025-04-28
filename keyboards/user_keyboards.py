@@ -33,3 +33,36 @@ def get_menu_kb() -> InlineKeyboardMarkup:
     ])
 
     return ikb
+
+def get_subscribe_kb() -> InlineKeyboardMarkup:
+    """Get subscribe kb"""
+    ikb = InlineKeyboardMarkup(inline_keyboard=[
+        [InlineKeyboardButton(text="Подписаться на канал", url=f"https://t.me/khosnullin_channel")],
+        [InlineKeyboardButton(text="Проверить подписку", callback_data="check_subscription")]
+    ])
+
+    return ikb
+
+
+def get_contact_reply_kb() -> ReplyKeyboardMarkup:
+    """Get contact reply kb"""
+    rkb = ReplyKeyboardMarkup(
+        keyboard=[
+            [
+                KeyboardButton(text='Отправить свой номер', request_contact=True),
+            ],
+        ],
+    )
+
+    return rkb
+
+
+def get_after_reg_kb() -> InlineKeyboardMarkup:
+    """Get after registration kb"""
+    ikb = InlineKeyboardMarkup(
+        inline_keyboard=[
+            [InlineKeyboardButton(text='Управление магазинами', callback_data='cb_btn_manage_stores')],
+        ]
+    )
+
+    return ikb

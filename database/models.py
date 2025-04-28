@@ -19,9 +19,9 @@ class User(Base):
     bonus_total: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
     bonus_left: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
 
-    stores: Mapped[list["Store"]] = relationship("Store", back_populates="user")
-    reports: Mapped[list["Report"]] = relationship("Report", back_populates="user")
-    payments: Mapped[list["Payment"]] = relationship("Payment", back_populates="user")
+    user_stores: Mapped[list["Store"]] = relationship("Store", back_populates="user")
+    user_reports: Mapped[list["Report"]] = relationship("Report", back_populates="user")
+    user_payments: Mapped[list["Payment"]] = relationship("Payment", back_populates="user")
     referred_by: Mapped[list["Ref"]] = relationship(
         "Ref", foreign_keys="[Ref.referral_id]", back_populates="referral"
     )
@@ -38,8 +38,8 @@ class Store(Base):
     name: Mapped[str] = mapped_column(String(64), nullable=False)
     token: Mapped[str] = mapped_column(String(512), nullable=False)
 
-    reports: Mapped[list["Report"]] = relationship("Report", back_populates="reports")
-    user: Mapped["User"] = relationship("User", back_populates="stores")
+    store_reports: Mapped[list["Report"]] = relationship("Report", back_populates="store")
+    user: Mapped["User"] = relationship("User", back_populates="user_stores")
 
 
 class Report(Base):
@@ -51,8 +51,8 @@ class Report(Base):
     report_path: Mapped[str] = mapped_column(String, nullable=False)
     store_id: Mapped[int] = mapped_column(ForeignKey("store.id"), nullable=False)
 
-    user: Mapped["User"] = relationship("User", back_populates="reports")
-    store: Mapped["Store"] = relationship("Store", back_populates="reports")
+    user: Mapped["User"] = relationship("User", back_populates="user_reports")
+    store: Mapped["Store"] = relationship("Store", back_populates="store_reports")
 
 
 class Ref(Base):
@@ -82,7 +82,7 @@ class Payment(Base):
     amount: Mapped[int] = mapped_column(Integer, nullable=False)
     generations_num: Mapped[int] = mapped_column(Integer, default=1, nullable=False)
 
-    user: Mapped["User"] = relationship("User", back_populates="payments")
+    user: Mapped["User"] = relationship("User", back_populates="user_payments")
 
 
 class Article(Base):

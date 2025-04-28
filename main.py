@@ -19,8 +19,6 @@ from handlers.partners import partners_router
 
 from common.bot_commands_list import user_commands
 
-ALLOWED_UPDATES = ['message']
-
 # logging settings
 logging.basicConfig(
     level=logging.INFO,
@@ -63,7 +61,7 @@ async def main() -> None:
 
         await bot.delete_webhook(drop_pending_updates=True)
         await bot.set_my_commands(commands=user_commands, scope=types.BotCommandScopeAllPrivateChats())
-        await dp.start_polling(bot, allowed_updates=ALLOWED_UPDATES)
+        await dp.start_polling(bot, allowed_updates=dp.resolve_used_update_types())
     except Exception as ex:
         logging.error(f"Bot stopped with error: {ex}")
     finally:

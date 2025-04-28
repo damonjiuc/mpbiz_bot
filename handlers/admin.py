@@ -7,7 +7,7 @@ from keyboards.admin_keyboards import get_admin_reply_kb
 admin_router = Router(name="admin_router")
 admin_router.message.filter(ChatTypeFilter(["private"]), IsAdmin())
 
-@admin_router.message(or_f(Command("about"), (F.text.lower().contains('админ')), (F.text.lower().contains('admin'))))
+@admin_router.message(or_f(Command("admin"), (F.text.lower().contains('админ')), (F.text.lower().contains('admin'))))
 async def cmd_admin(msg: types.Message) -> None:
     """Command admin"""
     reply_text = f'Приветствую - {msg.from_user.first_name}!\n'
