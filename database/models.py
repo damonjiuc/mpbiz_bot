@@ -1,3 +1,5 @@
+from typing import Optional
+
 from sqlalchemy import DateTime, String, Text, Integer, Boolean, func, ForeignKey, Index
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 
@@ -18,8 +20,17 @@ class User(Base):
     generations_left: Mapped[int] = mapped_column(Integer, default=4, nullable=False)
     bonus_total: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
     bonus_left: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
+    selected_store_id: Mapped[Optional[int]] = mapped_column(ForeignKey("store.id", ondelete="SET NULL"), nullable=True)
 
-    user_stores: Mapped[list["Store"]] = relationship("Store", back_populates="user")
+    user_stores: Mapped[list["Store"]] = relationship(
+        "Store",
+        foreign_keys="[Store.tg_id]",
+        back_populates="user",
+        primaryjoin="User.tg_id == Store.tg_id")
+    selected_store: Mapped[Optional["Store"]] = relationship(
+        "Store",
+        foreign_keys=[selected_store_id],
+    )
     user_reports: Mapped[list["Report"]] = relationship("Report", back_populates="user")
     user_payments: Mapped[list["Payment"]] = relationship("Payment", back_populates="user")
     referred_by: Mapped[list["Ref"]] = relationship(
@@ -39,7 +50,7 @@ class Store(Base):
     token: Mapped[str] = mapped_column(String(512), nullable=False)
 
     store_reports: Mapped[list["Report"]] = relationship("Report", back_populates="store")
-    user: Mapped["User"] = relationship("User", back_populates="user_stores")
+    user: Mapped["User"] = relationship("User", back_populates="user_stores", foreign_keys=[tg_id])
 
 
 class Report(Base):

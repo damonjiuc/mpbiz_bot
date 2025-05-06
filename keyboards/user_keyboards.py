@@ -1,4 +1,7 @@
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton, ReplyKeyboardMarkup, KeyboardButton
+from aiogram.utils.keyboard import InlineKeyboardBuilder
+
+from services.manage_stores import orm_get_user_stores
 
 
 def get_main_kb() -> InlineKeyboardMarkup:
@@ -66,3 +69,20 @@ def get_after_reg_kb() -> InlineKeyboardMarkup:
     )
 
     return ikb
+
+
+async def get_manage_kb(session, tg_id) -> InlineKeyboardMarkup:
+    """Get manage stores kb"""
+    ikb = InlineKeyboardBuilder()
+    stores = await orm_get_user_stores(session=session, tg_id=tg_id)
+    for store in stores:
+        ikb.add(
+            InlineKeyboardButton(text=f'Выбрать {store.name}', callback_data=f'setstore_{store.id}'),
+            InlineKeyboardButton(text=f'Удалить {store.name}', callback_data=f'deletestore_{store.id}'),
+        )
+        print(f'deletestore_{store.id}')
+    ikb.adjust(2)
+    ikb.row(InlineKeyboardButton(text="Добавить магазин", callback_data='cb_btn_add_store'), )
+
+    return ikb.as_markup()
+
