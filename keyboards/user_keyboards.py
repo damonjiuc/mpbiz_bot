@@ -2,6 +2,7 @@ from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton, ReplyKeybo
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 
 from services.manage_stores import orm_get_user_stores
+from services.report_generator import get_weeks_range
 
 
 def get_main_kb() -> InlineKeyboardMarkup:
@@ -80,9 +81,21 @@ async def get_manage_kb(session, tg_id) -> InlineKeyboardMarkup:
             InlineKeyboardButton(text=f'Выбрать {store.name}', callback_data=f'setstore_{store.id}'),
             InlineKeyboardButton(text=f'Удалить {store.name}', callback_data=f'deletestore_{store.id}'),
         )
-        print(f'deletestore_{store.id}')
     ikb.adjust(2)
     ikb.row(InlineKeyboardButton(text="Добавить магазин", callback_data='cb_btn_add_store'), )
+
+    return ikb.as_markup()
+
+
+def get_period_kb() -> InlineKeyboardMarkup:
+    """Get select period kb"""
+    ikb = InlineKeyboardBuilder()
+    weeks_range = get_weeks_range(16)
+    for week in weeks_range:
+        ikb.add(
+            InlineKeyboardButton(text=f'{week}', callback_data=f'setweek_{week}'),
+        )
+    ikb.adjust(2)
 
     return ikb.as_markup()
 

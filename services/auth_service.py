@@ -1,12 +1,12 @@
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import selectinload
 
 from database.models import User
 
 
 async def orm_get_user(session: AsyncSession, tg_id: int):
-    print(tg_id)
-    query = select(User).where(User.tg_id == tg_id)
+    query = select(User).options(selectinload(User.selected_store)).where(User.tg_id == tg_id)
     result = await session.execute(query)
     return result.scalar_one_or_none()
 
