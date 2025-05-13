@@ -1,5 +1,6 @@
 from datetime import date, timedelta
 
+from services.logging import logger
 
 
 def get_weeks_range(count):

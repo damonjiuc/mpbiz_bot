@@ -7,13 +7,18 @@ from aiogram.enums import ParseMode
 
 from dotenv import find_dotenv, load_dotenv
 
+from services.logging import logger
+
 load_dotenv(find_dotenv())
 
 from middlewares.db import DataBaseSession
 
 from database.engine import create_db, drop_db, session_maker
 
+from handlers.registration import registration_router
 from handlers.user import user_router
+from handlers.stores import stores_router
+from handlers.reports import reports_router
 from handlers.admin import admin_router
 from handlers.partners import partners_router
 
@@ -31,9 +36,12 @@ bot.admins_list = [205569815]
 dp = Dispatcher()
 
 # Register routers
+dp.include_router(registration_router)
+dp.include_router(user_router)
+dp.include_router(stores_router)
+dp.include_router(reports_router)
 dp.include_router(admin_router)
 dp.include_router(partners_router)
-dp.include_router(user_router)
 
 
 async def on_startup(bot):
@@ -63,10 +71,10 @@ async def main() -> None:
         await bot.set_my_commands(commands=user_commands, scope=types.BotCommandScopeAllPrivateChats())
         await dp.start_polling(bot, allowed_updates=dp.resolve_used_update_types())
     except Exception as ex:
-        logging.error(f"Bot stopped with error: {ex}")
+        logger.error(f"Bot stopped with error: {ex}")
     finally:
         await bot.session.close()
-        logging.info("Bot session closed")
+        logger.info("Bot session closed")
 
 
 if __name__ == "__main__":

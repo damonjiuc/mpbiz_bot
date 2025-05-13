@@ -33,9 +33,6 @@ class User(Base):
     )
     user_reports: Mapped[list["Report"]] = relationship("Report", back_populates="user")
     user_payments: Mapped[list["Payment"]] = relationship("Payment", back_populates="user")
-    referred_by: Mapped[list["Ref"]] = relationship(
-        "Ref", foreign_keys="[Ref.referral_id]", back_populates="referral"
-    )
     referrals: Mapped[list["Ref"]] = relationship(
         "Ref", foreign_keys="[Ref.referrer_id]", back_populates="referrer"
     )
@@ -70,14 +67,11 @@ class Ref(Base):
     __tablename__ = 'ref'
 
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
-    referral_id: Mapped[int] = mapped_column(ForeignKey("user.tg_id"), nullable=False, unique=True)
+    referral_id: Mapped[int] = mapped_column(nullable=False, unique=True)
     referrer_id: Mapped[int] = mapped_column(ForeignKey("user.tg_id"), nullable=False)
 
     referrer: Mapped["User"] = relationship(
         "User", foreign_keys=[referrer_id], back_populates="referrals"
-    )
-    referral: Mapped["User"] = relationship(
-        "User", foreign_keys=[referral_id], back_populates="referred_by"
     )
 
     __table_args__ = (
