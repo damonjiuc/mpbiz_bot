@@ -32,7 +32,7 @@ def get_menu_kb() -> InlineKeyboardMarkup:
     """Get menu kb"""
     ikb = InlineKeyboardMarkup(inline_keyboard=[
         [InlineKeyboardButton(text='Генерация отчета', callback_data='cb_btn_generate_report'), InlineKeyboardButton(text='Управление магазинами', callback_data='cb_btn_manage_stores')],
-        [InlineKeyboardButton(text='Новости', callback_data='cb_btn_news'), InlineKeyboardButton(text='Поддержка', callback_data='cb_btn_help')],
+        [InlineKeyboardButton(text='Канал с лайфхаками', url='https://t.me/khosnullin_channel'), InlineKeyboardButton(text='Поддержка', callback_data='cb_btn_help')],
         [InlineKeyboardButton(text='Профиль', callback_data='cb_btn_profile'), InlineKeyboardButton(text='Рефералы', callback_data='cb_btn_refs'), InlineKeyboardButton(text='Оплата', callback_data='cb_btn_payment')],
     ])
 
@@ -61,17 +61,6 @@ def get_contact_reply_kb() -> ReplyKeyboardMarkup:
     return rkb
 
 
-def get_after_reg_kb() -> InlineKeyboardMarkup:
-    """Get after registration kb"""
-    ikb = InlineKeyboardMarkup(
-        inline_keyboard=[
-            [InlineKeyboardButton(text='Управление магазинами', callback_data='cb_btn_manage_stores')],
-        ]
-    )
-
-    return ikb
-
-
 async def get_manage_kb(session, tg_id) -> InlineKeyboardMarkup:
     """Get manage stores kb"""
     ikb = InlineKeyboardBuilder()
@@ -95,7 +84,57 @@ def get_period_kb() -> InlineKeyboardMarkup:
         ikb.add(
             InlineKeyboardButton(text=f'{week}', callback_data=f'setweek_{week}'),
         )
-    ikb.adjust(2)
+    ikb.adjust(1)
 
     return ikb.as_markup()
 
+
+def get_payment_kb() -> InlineKeyboardMarkup:
+    """Get payment kb"""
+    ikb = InlineKeyboardBuilder()
+    tariffs = {
+        'test': {
+            'name': 'Test',
+            'price': 490.00,
+            'generations_num': 1
+        },
+        'one': {
+            'name': 'Разовый',
+            'price': 490.00,
+            'generations_num': 1
+        },
+        'month': {
+            'name': 'Месяц',
+            'price': 1690.00,
+            'generations_num': 4
+        },'quarter': {
+            'name': 'Квартал',
+            'price': 4990.00,
+            'generations_num': 12
+        },'year': {
+            'name': 'Год',
+            'price': 17990.00,
+            'generations_num': 52
+        },
+    }
+    for tariff in tariffs.values():
+        ikb.add(
+            InlineKeyboardButton(
+                text=f'Оплатить {tariff["name"]}',
+                callback_data=f'payfor_{tariff["generations_num"]}_{tariff["price"]}'
+            )
+        )
+    ikb.adjust(1)
+    ikb.row(InlineKeyboardButton(text="Меню", callback_data='cb_btn_menu'), )
+
+    return ikb.as_markup()
+
+
+def get_payment_check_kb(payment_id) -> InlineKeyboardMarkup:
+    """Get kb for checking payment with input id"""
+    ikb = InlineKeyboardMarkup(inline_keyboard=[
+        [InlineKeyboardButton(text='Проверить оплату', callback_data=f'checkpayment_{payment_id}')],
+        [InlineKeyboardButton(text="Выбрать другой тариф", callback_data="cb_btn_payment")]
+    ])
+
+    return ikb

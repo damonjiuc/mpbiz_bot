@@ -3,7 +3,6 @@ import os
 import logging
 
 from aiogram import Bot, Dispatcher, types
-from aiogram.enums import ParseMode
 
 from dotenv import find_dotenv, load_dotenv
 
@@ -15,12 +14,11 @@ from middlewares.db import DataBaseSession
 
 from database.engine import create_db, drop_db, session_maker
 
-from handlers.registration import registration_router
 from handlers.user import user_router
-from handlers.stores import stores_router
 from handlers.reports import reports_router
 from handlers.admin import admin_router
 from handlers.partners import partners_router
+from handlers.common import common_router
 
 from common.bot_commands_list import user_commands
 
@@ -36,12 +34,11 @@ bot.admins_list = [205569815]
 dp = Dispatcher()
 
 # Register routers
-dp.include_router(registration_router)
 dp.include_router(user_router)
-dp.include_router(stores_router)
 dp.include_router(reports_router)
 dp.include_router(admin_router)
 dp.include_router(partners_router)
+dp.include_router(common_router)
 
 
 async def on_startup(bot):
