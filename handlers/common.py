@@ -21,7 +21,7 @@ async def cmd_start(msg: types.Message, state: FSMContext, session: AsyncSession
     await state.clear()
     user_id = int(msg.from_user.id)
     is_registered = await auth_service.orm_check_user_reg(session, user_id)
-    member = await msg.bot.get_chat_member('@khosnullin_channel', user_id) #@khosnullin_channel
+    member = await msg.bot.get_chat_member('@khosnullin_channel', user_id)
 
     if len(msg.text.split()) > 1:
         args = msg.text.split()[1]
@@ -40,7 +40,7 @@ async def cmd_start(msg: types.Message, state: FSMContext, session: AsyncSession
         )
     elif member.status not in ["member", "administrator", "creator"]:
         reply_text = f'Приветствую - {msg.from_user.first_name}!\n'
-        reply_text += 'Для доступа к боту подпишитесь на канал @khosnullin_channel!' #@khosnullin_channel
+        reply_text += 'Для доступа к боту подпишитесь на канал @khosnullin_channel!'
         await msg.answer(
             text=reply_text,
             reply_markup=get_subscribe_kb()
@@ -52,7 +52,7 @@ async def cmd_start(msg: types.Message, state: FSMContext, session: AsyncSession
 
 @common_router.callback_query(F.data == 'check_subscription')
 async def check_subscription(callback: types.CallbackQuery, state: FSMContext):
-    member = await callback.bot.get_chat_member('@mp_bot_test', callback.from_user.id) #@khosnullin_channel
+    member = await callback.bot.get_chat_member('@khosnullin_channel', callback.from_user.id)
     if member.status not in ["member", "administrator", "creator"]:
         await callback.answer("Вы ещё не подписаны.", show_alert=True)
     else:
@@ -72,7 +72,7 @@ async def add_user(msg: types.Message, state: FSMContext, session: AsyncSession)
     await state.clear()
     await msg.bot.delete_message(chat_id=msg.chat.id, message_id=msg.message_id-1)
     reply_text = 'Вы успешно зарегистрированы!\n'
-    reply_text += 'Для перехода к управлению магазинами нажмите на кнопку'
+    reply_text += 'Для перехода к управлению магазинами нажмите на кнопку – Управление магазинами'
 
     await msg.answer(
         text=reply_text,

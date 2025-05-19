@@ -2,7 +2,6 @@ from aiogram import Router, types, F
 from aiogram.filters import Command, or_f
 from aiogram.types import CallbackQuery
 from sqlalchemy.ext.asyncio import AsyncSession
-from tabulate import tabulate
 
 from keyboards.user_keyboards import get_main_kb, get_payment_kb, get_payment_check_kb
 from services.auth_service import orm_get_user
@@ -118,11 +117,12 @@ async def cb_check_payment(callback: CallbackQuery, session: AsyncSession):
         tg_id = int(result['user_id'])
         amount = int(result['amount'])
         referrer = await orm_get_referrer(session, tg_id)
-        if referrer is not None:
-            await orm_add_bonus(session, referrer, amount)
-        await orm_add_generations(session, tg_id, generations_num)
-        await orm_add_payment(session, tg_id, amount, generations_num, payment_id)
-        reply_text = f'Оплата прошла успешно, Вам добавлено {generations_num} генераций'
+        # if referrer is not None:
+        #     await orm_add_bonus(session, referrer, amount)
+        # await orm_add_generations(session, tg_id, generations_num)
+        # await orm_add_payment(session, tg_id, amount, generations_num, payment_id)
+        reply_text = f'Оплата прошла успешно, Вам добавлено {generations_num} генераций\n\n'
+        reply_text += f'В данный момент оплата не подключена и генерации не начисляются'
     else:
         reply_text = 'Платеж еще не прошел'
     await callback.message.answer(

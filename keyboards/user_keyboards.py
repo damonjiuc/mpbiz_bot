@@ -68,7 +68,7 @@ async def get_manage_kb(session, tg_id) -> InlineKeyboardMarkup:
     for store in stores:
         ikb.add(
             InlineKeyboardButton(text=f'Выбрать {store.name}', callback_data=f'setstore_{store.id}'),
-            InlineKeyboardButton(text=f'Удалить {store.name}', callback_data=f'deletestore_{store.id}'),
+            InlineKeyboardButton(text=f'Изменить {store.name}', callback_data=f'editstore_{store.id}'),
         )
     ikb.adjust(2)
     ikb.row(InlineKeyboardButton(text="Добавить магазин", callback_data='cb_btn_add_store'), )

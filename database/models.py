@@ -56,7 +56,6 @@ class Report(Base):
     date_of_week: Mapped[Date] = mapped_column(Date, nullable=False)
     report_path: Mapped[str] = mapped_column(String, nullable=False)
     store_id: Mapped[int] = mapped_column(ForeignKey("store.id"), nullable=False)
-    store_name: Mapped[str] = mapped_column(String(64), nullable=False)
 
 
 class Ref(Base):

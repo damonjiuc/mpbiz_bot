@@ -8,7 +8,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from services.auth_service import orm_get_user
 from keyboards.user_keyboards import get_period_kb, get_main_kb, get_manage_kb, get_menu_kb
-from services.manage_stores import orm_add_store, orm_delete_store, orm_set_store
+from services.manage_stores import orm_add_store, orm_set_store, orm_edit_store
 from services.payment import orm_reduce_generations
 from services.report_generator import generate_report_with_params, run_with_progress, orm_add_report
 
@@ -70,20 +70,6 @@ async def add_store_token(msg: types.Message, state: FSMContext, session: AsyncS
     await msg.answer(text=reply_text, reply_markup=get_menu_kb())
 
 
-@reports_router.callback_query(F.data.startswith('deletestore_'))
-async def cb_delete_store(callback: types.CallbackQuery, session: AsyncSession) -> None:
-    """Callback delete store"""
-    store_id = int(callback.data.split('_', 1)[1])
-
-    await orm_delete_store(session, store_id)
-    await callback.message.delete()
-    reply_text = f'Магазин {store_id} удален'
-    await callback.message.answer(reply_text)
-    await callback.answer()
-
-    await handle_manage_stores(callback.message, callback.from_user.id, session)
-
-
 @reports_router.callback_query(F.data.startswith('setstore_'))
 async def cb_set_store(callback: types.CallbackQuery, session: AsyncSession, state: FSMContext) -> None:
     """Callback set store"""
@@ -94,6 +80,41 @@ async def cb_set_store(callback: types.CallbackQuery, session: AsyncSession, sta
     await callback.answer()
 
     await handle_generate_report(callback.message, callback.from_user.id, session, state)
+
+
+class EditStore(StatesGroup):
+    Name = State()
+    Token = State()
+
+
+@reports_router.callback_query(F.data.startswith('editstore_'))
+async def cb_edit_store(callback: types.CallbackQuery, state: FSMContext) -> None:
+    """Callback delete store"""
+    await state.update_data(store_id = int(callback.data.split('_', 1)[1]))
+    reply_text = 'Введите название магазина:'
+    await callback.message.answer(reply_text)
+    await state.set_state(EditStore.Name)
+
+
+@reports_router.message(EditStore.Name, F.text)
+async def edit_store_name(msg: types.Message, state: FSMContext):
+    await state.update_data(name=msg.text)
+    reply_text = 'Введите токен магазина Wildberries. При его создании необходимо выбрать доступ к следующим разделам:\n\n'
+    reply_text += 'Контент, Статистика, Аналитика, Продвижение, Доступ чтение'
+    await msg.answer(reply_text)
+    await state.set_state(EditStore.Token)
+
+
+@reports_router.message(EditStore.Token, F.text)
+async def edit_store_token(msg: types.Message, state: FSMContext, session: AsyncSession):
+    await state.update_data(token=msg.text)
+    data = await state.get_data()
+    print(data)
+    reply_text = 'Магазин успешно Изменен!\n\n'
+    reply_text += 'Можете переходить к генерации отчета!'
+    await orm_edit_store(session, data)
+    await state.clear()
+    await msg.answer(text=reply_text, reply_markup=get_menu_kb())
 
 
 # ------------------ Reports ------------------
@@ -186,7 +207,7 @@ async def cmd_set_doc_num(msg: types.Message, state: FSMContext, session: AsyncS
             dates, doc_num, store_token, store_name, tg_id, store_id
         )
         await msg.answer_document(FSInputFile(file_path))
-        await orm_add_report(session, tg_id, date, file_path, store_id, store_name)
+        await orm_add_report(session, tg_id, date, file_path, store_id)
         await orm_reduce_generations(session, tg_id)
     except Exception as e:
         await msg.answer(

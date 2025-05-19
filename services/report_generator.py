@@ -31,7 +31,7 @@ async def run_with_progress(message: Message, title: str, coro, *args):
     """
     progress_message = await message.answer(f'{title}')
     task = asyncio.create_task(coro(*args))
-    progress_stages = ['', '.', '..', '...']
+    progress_stages = ['.', '..', '...']
     i = 0
     try:
         while not task.done():
@@ -82,13 +82,12 @@ def get_weeks_range(count):
     return weeks_range
 
 
-async def orm_add_report(session: AsyncSession, tg_id: int, date_of_week: date, report_path: str, store_id: int, store_name: str):
+async def orm_add_report(session: AsyncSession, tg_id: int, date_of_week: date, report_path: str, store_id: int):
     obj = Report(
         tg_id=tg_id,
         date_of_week=date_of_week,
         report_path=report_path,
         store_id=store_id,
-        store_name=store_name,
     )
     session.add(obj)
     await session.commit()
@@ -507,7 +506,7 @@ async def generate_report_with_params(dates: str, doc_number: str, store_token: 
 
     yellow=PatternFill(fill_type="solid",start_color="FFFF00",end_color="FFFF00")
 
-    output_folder = Path('data') / str(tg_id) / str(store_id)
+    output_folder = Path('data') / 'reports' / str(tg_id) / str(store_id)  # /data on server
     output_folder.mkdir(parents=True, exist_ok=True)
     path = output_folder / f'report{start_date}.xlsx'
 

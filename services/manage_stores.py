@@ -30,8 +30,8 @@ async def orm_get_store(session: AsyncSession, id: int):
     return result.scalar_one_or_none()
 
 
-async def orm_delete_store(session: AsyncSession, id: int):
-    query = delete(Store).where(Store.id == id)
+async def orm_edit_store(session: AsyncSession, store_data: dict):
+    query = update(Store).where(Store.id == store_data['store_id']).values(name = store_data['name'], token = store_data['token'])
     await session.execute(query)
     await session.commit()
 
