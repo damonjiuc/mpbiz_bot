@@ -46,11 +46,13 @@ async def cb_refs(callback: types.CallbackQuery, session: AsyncSession) -> None:
     referrals = await orm_get_refs(session, user_id)
     reply_text = f'{callback.from_user.first_name}, ваша реферальная ссылка:\n'
     reply_text += f'{ref_link}\n\n'
-    reply_text += f'Заработано бонусов: {user.bonus_total}\n'
-    reply_text += f'Доступно для использования: {user.bonus_left}\n\n'
-    reply_text += f'Список ваших рефералов:\n'
+    reply_text += f'💰 Заработано бонусов: {user.bonus_total} ₽\n'
+    reply_text += f'💸 Доступно для использования: {user.bonus_left} ₽\n\n'
+    reply_text += f'👥 Ваши рефералы:\n'
     for ref in referrals:
         reply_text += f'+{ref}\n'
+    reply_text += '\n📌 За каждого пользователя, который оплатит доступ по вашей ссылке — вы получаете 10% от его платежа в виде бонусов. Эти бонусы можно тратить на покупку расшифровок финансовых отчётов прямо в боте.\n\n'
+    reply_text += 'Рекомендуйте и зарабатывайте 🎯'
     await callback.answer()
     await callback.message.answer(
         text=reply_text,
@@ -117,12 +119,11 @@ async def cb_check_payment(callback: CallbackQuery, session: AsyncSession):
         tg_id = int(result['user_id'])
         amount = int(result['amount'])
         referrer = await orm_get_referrer(session, tg_id)
-        # if referrer is not None:
-        #     await orm_add_bonus(session, referrer, amount)
-        # await orm_add_generations(session, tg_id, generations_num)
-        # await orm_add_payment(session, tg_id, amount, generations_num, payment_id)
+        if referrer is not None:
+            await orm_add_bonus(session, referrer, amount)
+        await orm_add_generations(session, tg_id, generations_num)
+        await orm_add_payment(session, tg_id, amount, generations_num, payment_id)
         reply_text = f'Оплата прошла успешно, Вам добавлено {generations_num} генераций\n\n'
-        reply_text += f'В данный момент оплата не подключена и генерации не начисляются'
     else:
         reply_text = 'Платеж еще не прошел'
     await callback.message.answer(

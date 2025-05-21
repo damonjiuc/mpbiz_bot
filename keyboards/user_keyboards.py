@@ -32,8 +32,8 @@ def get_menu_kb() -> InlineKeyboardMarkup:
     """Get menu kb"""
     ikb = InlineKeyboardMarkup(inline_keyboard=[
         [InlineKeyboardButton(text='Генерация отчета', callback_data='cb_btn_generate_report'), InlineKeyboardButton(text='Управление магазинами', callback_data='cb_btn_manage_stores')],
-        [InlineKeyboardButton(text='Канал с лайфхаками', url='https://t.me/khosnullin_channel'), InlineKeyboardButton(text='Поддержка', callback_data='cb_btn_help')],
-        [InlineKeyboardButton(text='Профиль', callback_data='cb_btn_profile'), InlineKeyboardButton(text='Рефералы', callback_data='cb_btn_refs'), InlineKeyboardButton(text='Оплата', callback_data='cb_btn_payment')],
+        [InlineKeyboardButton(text='Канал с лайфхаками', url='https://t.me/+TXjDiIu3hnJmYmZi'), InlineKeyboardButton(text='Поддержка', url='https://t.me/paganini_support_bot')],
+        [InlineKeyboardButton(text='Профиль', callback_data='cb_btn_profile'), InlineKeyboardButton(text='Партнерка', callback_data='cb_btn_refs'), InlineKeyboardButton(text='Оплата', callback_data='cb_btn_payment')],
     ])
 
     return ikb
@@ -41,7 +41,7 @@ def get_menu_kb() -> InlineKeyboardMarkup:
 def get_subscribe_kb() -> InlineKeyboardMarkup:
     """Get subscribe kb"""
     ikb = InlineKeyboardMarkup(inline_keyboard=[
-        [InlineKeyboardButton(text="Подписаться на канал", url=f"https://t.me/khosnullin_channel")],
+        [InlineKeyboardButton(text="Подписаться на канал", url=f"https://t.me/+TXjDiIu3hnJmYmZi")],
         [InlineKeyboardButton(text="Проверить подписку", callback_data="check_subscription")]
     ])
 
@@ -93,11 +93,6 @@ def get_payment_kb() -> InlineKeyboardMarkup:
     """Get payment kb"""
     ikb = InlineKeyboardBuilder()
     tariffs = {
-        'test': {
-            'name': 'Test',
-            'price': 490.00,
-            'generations_num': 1
-        },
         'one': {
             'name': 'Разовый',
             'price': 490.00,

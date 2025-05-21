@@ -463,7 +463,14 @@ async def generate_report_with_params(dates: str, doc_number: str, store_token: 
             "подписке «Джем»|Списание за отзыв|ВБ\.?Продвижение|Акт утилизации товара",
             case=False,na=False
         )
-        total_other=df_raw.loc[mask_other,"deduction"].sum()
+        total_other += df_raw.loc[mask_other,"deduction"].sum()
+    if "penalty" in df_raw.columns:
+        total_penalty = df_raw.loc[
+            (df_raw["nm_id"] == 0) & (df_raw["penalty"] != 0),
+            "penalty"
+        ].sum()
+        print(total_penalty)
+        total_other += total_penalty
 
     # объединяем
     for df,col in [(sales_df,"Артикул WB"),(storage_df,"nmId"),(adv_df,"Артикул WB"),(acceptance_df,"Артикул WB")]:
@@ -504,6 +511,22 @@ async def generate_report_with_params(dates: str, doc_number: str, store_token: 
     ]
     final_df=merged[final_cols]
 
+    # Добавляем столбец "На расчетный счет"
+    final_df["На расчетный счет"] = (
+        final_df["К Перечислению"]
+        - final_df["Логистика, руб"]
+        - final_df["Штрафы"]
+        + final_df["Доплаты"]
+        - final_df["Возвраты"]
+        - final_df["Хранение"]
+        - final_df["ВБ.Продвижение"]
+        - final_df["Подписка «Джем»"]
+        - final_df["Платная приемка"]
+        - final_df["Утилизация"]
+        - final_df["Списание за отзывы"]
+        - final_df["Прочие удержания"]
+    )
+
     yellow=PatternFill(fill_type="solid",start_color="FFFF00",end_color="FFFF00")
 
     output_folder = Path('data') / 'reports' / str(tg_id) / str(store_id)  # /data on server
@@ -522,7 +545,7 @@ async def generate_report_with_params(dates: str, doc_number: str, store_token: 
             ws.column_dimensions[col[0].column_letter].width=length+2
         summary=ws.max_row+1
         ws.cell(row=summary,column=1,value="Итого").font=Font(bold=True)
-        for idx in range(3,len(final_cols)+1):
+        for idx in range(3,len(final_cols)+2):
             letter=get_column_letter(idx)
             c=ws.cell(row=summary,column=idx,value=f"=SUM({letter}4:{letter}{summary-1})")
             c.font=Font(color="FF0000"); c.fill=yellow

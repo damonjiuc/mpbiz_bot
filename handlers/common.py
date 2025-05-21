@@ -1,5 +1,5 @@
 from aiogram import Router, types, F
-from aiogram.filters import Command, or_f
+from aiogram.filters import Command, or_f, StateFilter
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import StatesGroup, State
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -47,7 +47,9 @@ async def cmd_start(msg: types.Message, state: FSMContext, session: AsyncSession
         )
     else:
         await state.set_state(Registration.contact)
-        await msg.answer("Пожалуйста, поделитесь своим контактом.", reply_markup=get_contact_reply_kb())
+        await msg.answer(
+            text="Пожалуйста, поделитесь своим контактом.\nДля этого нажмите на кнопку внизу.",
+            reply_markup=get_contact_reply_kb())
 
 
 @common_router.callback_query(F.data == 'check_subscription')
@@ -57,7 +59,10 @@ async def check_subscription(callback: types.CallbackQuery, state: FSMContext):
         await callback.answer("Вы ещё не подписаны.", show_alert=True)
     else:
         await state.set_state(Registration.contact)
-        await callback.message.answer("Пожалуйста, поделитесь своим контактом.", reply_markup=get_contact_reply_kb())
+        await callback.message.answer(
+            text="Пожалуйста, поделитесь своим контактом.\nДля этого нажмите на кнопку внизу.",
+            reply_markup=get_contact_reply_kb()
+        )
 
 
 @common_router.message(Registration.contact, F.contact)
@@ -77,6 +82,14 @@ async def add_user(msg: types.Message, state: FSMContext, session: AsyncSession)
     await msg.answer(
         text=reply_text,
         reply_markup=get_menu_kb()
+    )
+
+
+@common_router.message(StateFilter(Registration.contact),~F.contact)
+async def check_contact(msg: types.Message, state: FSMContext):
+    await msg.answer(
+        text='Пожалуйста, поделитесь своим контактом.\nДля этого нажмите на кнопку внизу.',
+        reply_markup=get_contact_reply_kb()
     )
 
 
